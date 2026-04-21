@@ -139,7 +139,7 @@ function answer(a){
         score++;
         document.getElementById("correct").play();
         let fullSentence = item.q.replace(/___/g, a).replace(/\s+/g, " ").trim();
-        speak(fullSentence + ". Great job!");
+        speak("Great job! " + fullSentence + ".");
     } else {
         document.getElementById("wrong").play();
         speak("Try again!");
