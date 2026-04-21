@@ -8,7 +8,7 @@
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    background: linear-gradient(135deg, #5b9bd5, #2e6da4);
     text-align: center;
     margin: 0;
 }
@@ -118,7 +118,9 @@ function ask(){
 
     document.getElementById("question").innerText = q.q;
 
-    speak(q.q); // صوت
+    // TTS: read only real words, not the blank placeholder "___"
+    let forSpeech = q.q.replace(/___/g, "").replace(/\s+/g, " ").trim();
+    speak(forSpeech);
 
     let html = "";
     q.o.forEach(opt=>{
@@ -130,12 +132,14 @@ function ask(){
 
 // Answer
 function answer(a){
-    let correct = levels[currentLevel][index].a;
+    let item = levels[currentLevel][index];
+    let correct = item.a;
 
     if(a === correct){
         score++;
         document.getElementById("correct").play();
-        speak("Great job!");
+        let fullSentence = item.q.replace(/___/g, a).replace(/\s+/g, " ").trim();
+        speak(fullSentence + ". Great job!");
     } else {
         document.getElementById("wrong").play();
         speak("Try again!");
