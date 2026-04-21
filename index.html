@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids English Game 🎮</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    text-align: center;
+    margin: 0;
+}
+.screen { display: none; padding: 20px; }
+.active { display: block; }
+
+button {
+    padding: 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 15px;
+    font-size: 18px;
+    background: #ffcc00;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 20px;
+}
+
+.mascot {
+    font-size: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎮 Fun English Adventure</h1>
+
+<!-- Start -->
+<div id="start" class="screen active">
+    <div class="mascot">🐵</div>
+    <h2>Hi! Let's play and learn!</h2>
+    <button onclick="startGame()">▶ Start</button>
+</div>
+
+<!-- Map -->
+<div id="map" class="screen">
+    <h2>Choose Level 🗺️</h2>
+    <button onclick="startLevel(0)">Level 1 ⭐</button>
+    <button onclick="startLevel(1)">Level 2 🔒</button>
+</div>
+
+<!-- Game -->
+<div id="game" class="screen">
+    <div class="mascot" id="mascot">🐵</div>
+    <div class="card">
+        <h2 id="question"></h2>
+        <div id="answers"></div>
+    </div>
+</div>
+
+<!-- Result -->
+<div id="result" class="screen">
+    <h2 id="final"></h2>
+    <h3 id="stars"></h3>
+    <button onclick="goMap()">🔙 Back to Map</button>
+</div>
+
+<audio id="correct" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9bce50.mp3"></audio>
+<audio id="wrong" src="https://cdn.pixabay.com/audio/2022/03/15/audio_66d0c3c9b0.mp3"></audio>
+
+<script>
+
+// Levels
+let levels = [
+[
+{q:"We eat in the ___", o:["bedroom","dining room"], a:"dining room"},
+{q:"There ___ a bed", o:["is","are"], a:"is"},
+{q:"Sunday comes ___ Monday", o:["before","after"], a:"before"}
+],
+[
+{q:"I watch TV in the ___", o:["kitchen","living room"], a:"living room"},
+{q:"My favorite season is ___", o:["spring","Friday"], a:"spring"},
+{q:"We ___ in the bedroom", o:["sleep","eat"], a:"sleep"}
+]
+];
+
+let currentLevel = 0;
+let index = 0;
+let score = 0;
+
+// Start
+function startGame(){
+    show("map");
+}
+
+// Start Level
+function startLevel(l){
+    if(l > 0 && score < 3){
+        alert("Finish Level 1 first!");
+        return;
+    }
+    currentLevel = l;
+    index = 0;
+    score = 0;
+    show("game");
+    ask();
+}
+
+// Ask Question
+function ask(){
+    let q = levels[currentLevel][index];
+
+    document.getElementById("question").innerText = q.q;
+
+    speak(q.q); // صوت
+
+    let html = "";
+    q.o.forEach(opt=>{
+        html += `<button onclick="answer('${opt}')">${opt}</button>`;
+    });
+
+    document.getElementById("answers").innerHTML = html;
+}
+
+// Answer
+function answer(a){
+    let correct = levels[currentLevel][index].a;
+
+    if(a === correct){
+        score++;
+        document.getElementById("correct").play();
+        speak("Great job!");
+    } else {
+        document.getElementById("wrong").play();
+        speak("Try again!");
+    }
+
+    index++;
+
+    if(index < levels[currentLevel].length){
+        setTimeout(ask, 800);
+    } else {
+        end();
+    }
+}
+
+// End
+function end(){
+    show("result");
+
+    document.getElementById("final").innerText =
+        `Score: ${score}/${levels[currentLevel].length}`;
+
+    let stars = Math.round((score/levels[currentLevel].length)*5);
+    document.getElementById("stars").innerText = "⭐".repeat(stars);
+
+    if(score === levels[currentLevel].length){
+        speak("Amazing! You win!");
+    }
+}
+
+// Navigation
+function show(id){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+function goMap(){
+    show("map");
+}
+
+// Text-to-Speech
+function speak(text){
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "en-US";
+    speechSynthesis.speak(msg);
+}
+
+</script>
+
+</body>
+</html>
